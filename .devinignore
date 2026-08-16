@@ -1,0 +1,4 @@
+# Devin Desktop (formerly Windsurf) / Cascade — exclude from indexing.
+# The legacy filename .codeiumignore is also read if that's what your build
+# looks for; this is the current name. See AGENTS.md §0 for why.
+docs/archive/

@@ -1,0 +1,11 @@
+# Normalise line endings. Without this, a Windows checkout with core.autocrlf=true
+# rewrites every file to CRLF — which breaks .sql and shell scripts mounted into
+# the Linux Postgres container, and shows the whole repo as modified for anyone
+# on Linux/macOS.
+* text=auto eol=lf
+
+# Binary — never touch.
+*.png binary
+*.jpg binary
+*.parquet binary
+*.tar.gz binary

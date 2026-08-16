@@ -1,0 +1,35 @@
+# Rules in AGENTS.md are context, not enforcement. This is the enforcement half.
+#   pip install -e ".[dev]" && pre-commit install
+default_language_version:
+  python: python3.12
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+        args: ["--maxkb=2048"]   # corpora and parquet dumps do not belong in git
+      - id: detect-private-key
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: check-invariants
+        name: AGENTS.md §5 mechanical invariants
+        entry: python scripts/check_invariants.py
+        # `language: system` would resolve bare `python` from PATH — that hits the
+        # Microsoft Store stub on Windows. This uses pre-commit's own managed
+        # interpreter instead, which works identically on Windows/Linux/macOS.
+        language: python
+        pass_filenames: false
+        always_run: true

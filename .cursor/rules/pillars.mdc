@@ -1,0 +1,22 @@
+---
+description: Pillar engines, reconciliation, and fusion — component-specific invariants
+globs: ["seraph/pillars/**", "seraph/reconciliation/**", "seraph/fusion/**"]
+alwaysApply: false
+---
+
+# Pillar / reconciliation / fusion invariants
+
+Full detail: `docs/ARCHITECTURE.md` §7 (decisions D1–D5) and `AGENTS.md` §5.
+
+- `unavailable` pillar emissions are `Ok`, never `Err`.
+- `structural` absence → excluded from the D2 mask (`false`); `transient`
+  absence → stays in the mask, D4 age-inflation handles it.
+- `R^(p)(Δ)` must use D4's bounded saturating exponential — never a linear or
+  unbounded form.
+- `Ω_t` (RMT rotation) is computed only on common support
+  (`members(t) ∩ members(t−Δ)`), both eigenvectors renormalized first — never
+  across a rebalance date on full 500-dim vectors.
+- `AR_t` belongs in `seraph/features/cross_sectional.py` (C4), never inside
+  `seraph/pillars/rmt/` (C6).
+- `seraph/fusion/score.py` (C9) is a pure function — no DB calls, no import of
+  `seraph/validation/` (C10).

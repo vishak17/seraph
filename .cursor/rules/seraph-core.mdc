@@ -1,0 +1,21 @@
+---
+description: SERAPH project-wide rules — always active
+alwaysApply: true
+---
+
+# SERAPH — core rules
+
+Full rules, stack, and invariants live in `AGENTS.md` at the repo root (Cursor
+reads it natively too). This file is a short Cursor-specific backstop so the
+handful of easiest-to-violate rules survive even in a thin context window.
+
+- `PILLAR_ORDER = ["hawkes", "rmt", "hamilton"]` is fixed everywhere — never reorder.
+- Docs win over code. If `docs/SPEC.md` / `docs/ARCHITECTURE.md` conflict with
+  existing code, flag it — don't silently patch around it.
+- Never invent a value for anything marked `[GAP]` / OQ in `docs/SPEC.md`.
+  Check `docs/SERAPH-BUILD-ROADMAP.md` §4 for the agreed default; if it's not
+  there, ask.
+- `docs/archive/SPEC-DELTA-01.md` is superseded — never cite it as current
+  spec. It's excluded from indexing (`.cursorindexingignore`); only open it if
+  the task is explicitly report §5.1.2 or viva prep.
+- `seraph/shared_types/` — ask before editing; every component imports from it.

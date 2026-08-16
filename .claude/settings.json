@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(docs/archive/**)"
+    ],
+    "ask": [
+      "Edit(seraph/shared_types/**)",
+      "Write(seraph/shared_types/**)"
+    ]
+  }
+}

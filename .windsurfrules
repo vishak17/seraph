@@ -1,0 +1,12 @@
+See AGENTS.md at the repo root for the full SERAPH rules, stack, and
+invariants. This file exists only as a fallback for teammates on Windsurf
+builds that predate Devin Desktop / native AGENTS.md reads.
+
+Critical invariants if AGENTS.md somehow isn't loading:
+- PILLAR_ORDER = ["hawkes", "rmt", "hamilton"] is fixed everywhere.
+- docs/SPEC.md and docs/ARCHITECTURE.md win over existing code on any
+  conflict. Never invent values for anything marked [GAP]/OQ — check
+  docs/SERAPH-BUILD-ROADMAP.md §4, else ask.
+- docs/archive/SPEC-DELTA-01.md is superseded historical material — do not
+  treat it as current spec.
+- seraph/shared_types/ — ask before editing; every component imports from it.

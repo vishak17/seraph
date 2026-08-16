@@ -1,0 +1,6 @@
+# Keep the superseded spec out of semantic search / auto-context so it can't
+# surface as if it were current spec. It stays explicitly readable via
+# @docs/archive/SPEC-DELTA-01.md when someone deliberately wants it (report
+# §5.1.2, viva prep) — this file only controls automatic indexing, not access.
+# See AGENTS.md §0 and the banner inside SPEC-DELTA-01.md itself.
+docs/archive/

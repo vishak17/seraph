@@ -1,0 +1,5 @@
+# CT-1 .. CT-10, one file each (test_ct1_*.py ... test_ct10_*.py).
+# Each contract test is written BEFORE the component it tests.
+# Run order (not build order) is docs/SERAPH-BUILD-ROADMAP.md §3 —
+# CT-4/CT-6/CT-9/CT-5 are runnable on day 2 against the T0 mocks.
+# Nothing here yet: Phase 0 is skeleton only.

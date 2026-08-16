@@ -1,0 +1,51 @@
+# SERAPH — single-node Postgres + TimescaleDB (NFR34, NFR35).
+# One service, deliberately. No k8s, no replicas — nothing here needs them.
+#
+#   cp .env.example .env      # then edit POSTGRES_PASSWORD
+#   docker compose up -d
+#   docker compose exec db psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+#
+# Schema DDL is NOT applied here — `seraph/store/schema.sql` is C1's, and lands
+# in Phase 1. This file only provides the running engine.
+
+services:
+  db:
+    image: timescale/timescaledb:2.17.2-pg16
+    container_name: seraph-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-seraph}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-seraph}
+      # IST everywhere, explicitly — AGENTS.md §5.
+      TZ: Asia/Kolkata
+      PGTZ: Asia/Kolkata
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - seraph_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-seraph} -d ${POSTGRES_DB:-seraph}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    shm_size: 1g
+    command:
+      - postgres
+      # ~19M intraday rows and a 1000x500 rolling window — the defaults are too
+      # small for the COPY-based historical backfill. Tune against real hardware
+      # in Phase 2; these are sane single-node starting values for >=8 GB RAM.
+      - -c
+      - shared_preload_libraries=timescaledb
+      - -c
+      - max_connections=50
+      - -c
+      - shared_buffers=1GB
+      - -c
+      - work_mem=32MB
+      - -c
+      - maintenance_work_mem=512MB
+
+volumes:
+  seraph_pgdata:

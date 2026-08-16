@@ -1,0 +1,85 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "seraph"
+version = "0.0.0"
+description = "SERAPH — unified quantitative early-warning framework for systemic instability on the Indian NSE"
+readme = "README-AI-SETUP.md"
+requires-python = ">=3.12"
+license = { text = "Proprietary" }
+
+# Floors, not pins — per AGENTS.md §7. Pin exact versions only once the
+# environment is reproducible end-to-end (Phase 2+).
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "polars>=0.20",
+    "pandas>=2.2",          # small aggregated frames only — Polars is the ingestion engine
+    "statsmodels>=0.14",    # C7 Hamilton TVTP (exog_tvtp)
+    "pydantic>=2.5",
+    "asyncpg>=0.29",        # C1 — direct driver, no ORM
+    "streamlit>=1.30",      # C12
+]
+
+[project.optional-dependencies]
+# `tick` (X-DataInitiative) is the C5 Hawkes MLE baseline per AGENTS.md §2.
+# Verified 2026-08-15: tick 0.8.0.2 installs from a cp312 win_amd64 binary wheel
+# and imports cleanly on Windows + Python 3.12 — no source build needed.
+# Kept as an opt-in extra only because it drags in matplotlib + scikit-learn,
+# which nobody outside C5 needs. Install when starting Phase 5:
+#   pip install -e ".[hawkes]"
+hawkes = [
+    "tick",
+]
+
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "hypothesis>=6.0",      # weights sum to 1, P stays PSD, mask renormalisation
+    "ruff>=0.5",
+    "mypy>=1.10",
+    "pre-commit>=3.7",
+]
+
+[tool.setuptools.packages.find]
+include = ["seraph*", "fixtures*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "contract: CT-1..CT-10 contract tests (ARCHITECTURE.md §5)",
+    "slow: takes more than a few seconds (bootstrap replications, MLE sweeps)",
+    "requires_db: needs the docker-compose Postgres+TimescaleDB service up",
+    "requires_network: hits an external data source — never run in CI by default",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "NPY"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["seraph", "fixtures"]
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unreachable = true
+disallow_untyped_defs = true
+namespace_packages = true
+
+# Third-party stubs are patchy for the numerical stack — don't let that block
+# type-checking our own code.
+[[tool.mypy.overrides]]
+module = ["statsmodels.*", "tick.*", "polars.*", "streamlit.*", "scipy.*"]
+ignore_missing_imports = true
+
+[tool.coverage.run]
+source = ["seraph"]
